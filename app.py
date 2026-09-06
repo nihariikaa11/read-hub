@@ -94,7 +94,7 @@ def init_db():
             FOREIGN KEY (book_id) REFERENCES books (id)
         )
     ''')
-    
+
     conn.commit()
     conn.close()
 
@@ -152,6 +152,30 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+@app.route('/books')
+def books():
+    conn = get_db_connection()
+    all_books = conn.execute('SELECT * FROM books').fetchall()
+    conn.close()
+    return render_template('books.html', books=all_books)
+
+@app.route('/book/<int:book_id>')
+def book_detail(book_id):
+    conn = get_db_connection()
+    book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
+    chapters = conn.execute('SELECT * FROM chapters WHERE book_id = ?', (book_id,)).fetchall()
+    conn.close()
+    return render_template('book_detail.html', book=book, chapters=chapters)
+    
+@app.route('/read/<int:chapter_id>')
+def read_chapter(chapter_id):
+    conn = get_db_connection()
+    chapter = conn.execute('SELECT * FROM chapters WHERE id = ?', (chapter_id,)).fetchone()
+    book = conn.execute('SELECT * FROM books WHERE id = ?', (chapter['book_id'],)).fetchone()
+    all_chapters = conn.execute('SELECT * FROM chapters WHERE book_id = ? ORDER BY chapter_number', (chapter['book_id'],)).fetchall()
+    conn.close()
+    return render_template('read_chapter.html', chapter=chapter, book=book, all_chapters=all_chapters)
 
 if __name__ == '__main__':
     init_db()

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ chapter['title'] }} - {{ book['title'] }}</title>
+</head>
+<body>
+    <p><a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a></p>
+    <h1>{{ book['title'] }}</h1>
+    <h2>{{ chapter['title'] }}</h2>
+
+    <p>{{ chapter['content'] }}</p>
+
+    <hr>
+    <h3>All Chapters</h3>
+    {% for ch in all_chapters %}
+        <p><a href="/read/{{ ch['id'] }}">{{ ch['title'] }}</a></p>
+    {% endfor %}
+</body>
+</html>

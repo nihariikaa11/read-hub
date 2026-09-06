@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ book['title'] }}</title>
+</head>
+<body>
+    <p><a href="/books">Back to Books</a></p>
+    <h1>{{ book['title'] }}</h1>
+    <p>by {{ book['author'] }}</p>
+    <p>{{ book['description'] }}</p>
+
+    <h2>Chapters</h2>
+    {% for chapter in chapters %}
+        <p><a href="/read/{{ chapter['id'] }}">{{ chapter['title'] }}</a></p>
+    {% endfor %}
+
+    {% if chapters|length == 0 %}
+        <p><em>No chapters available for this book yet.</em></p>
+    {% endif %}
+</body>
+</html>
