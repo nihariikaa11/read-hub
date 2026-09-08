@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BookNook - Home</title>
+    <title>Read Rush - Home</title>
 </head>
 <body>
-    <h1>Welcome to BookNook 📚</h1>
-    <p><a href="/signup">Sign Up</a> | <a href="/login">Login</a> | <a href="/logout">Logout</a></p>
+    <h1>Welcome to Read Rush 📚</h1>
+
+    {% if session.get('username') %}
+        <p>Welcome back, {{ session['username'] }}!</p>
+        <p><a href="/books">Browse Books</a> | <a href="/logout">Logout</a></p>
+    {% else %}
+        <p><a href="/signup">Sign Up</a> | <a href="/login">Login</a></p>
+    {% endif %}
 </body>
 </html>

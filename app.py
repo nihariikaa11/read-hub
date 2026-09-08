@@ -165,8 +165,16 @@ def book_detail(book_id):
     conn = get_db_connection()
     book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
     chapters = conn.execute('SELECT * FROM chapters WHERE book_id = ?', (book_id,)).fetchall()
+    like_count = conn.execute('SELECT COUNT(*) FROM likes WHERE book_id = ?', (book_id,)).fetchone()[0]
+    reviews = conn.execute('SELECT reviews.*, users.username FROM reviews JOIN users ON reviews.user_id = users.id WHERE book_id = ?', (book_id,)).fetchall()
+
+    user_liked = False
+    if 'user_id' in session:
+        liked = conn.execute('SELECT * FROM likes WHERE user_id = ? AND book_id = ?', (session['user_id'], book_id)).fetchone()
+        user_liked = liked is not None
+
     conn.close()
-    return render_template('book_detail.html', book=book, chapters=chapters)
+    return render_template('book_detail.html', book=book, chapters=chapters, like_count=like_count, reviews=reviews, user_liked=user_liked)
     
 @app.route('/read/<int:chapter_id>')
 def read_chapter(chapter_id):
@@ -177,6 +185,42 @@ def read_chapter(chapter_id):
     conn.close()
     return render_template('read_chapter.html', chapter=chapter, book=book, all_chapters=all_chapters)
 
+@app.route('/like/<int:book_id>', methods=['POST'])
+def like_book(book_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    existing = conn.execute(
+        'SELECT * FROM likes WHERE user_id = ? AND book_id = ?',
+        (session['user_id'], book_id)
+    ).fetchone()
+
+    if existing:
+        conn.execute('DELETE FROM likes WHERE user_id = ? AND book_id = ?', (session['user_id'], book_id))
+    else:
+        conn.execute('INSERT INTO likes (user_id, book_id) VALUES (?, ?)', (session['user_id'], book_id))
+
+    conn.commit()
+    conn.close()
+    return redirect(url_for('book_detail', book_id=book_id))
+
+@app.route('/review/<int:book_id>', methods=['POST'])
+def add_review(book_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    rating = request.form['rating']
+    comment = request.form['comment']
+
+    conn = get_db_connection()
+    conn.execute(
+        'INSERT INTO reviews (user_id, book_id, rating, comment) VALUES (?, ?, ?, ?)',
+        (session['user_id'], book_id, rating, comment)
+    )
+    conn.commit()
+    conn.close()
+    # return redirect(url_for('book_detail', book_id=book_id))
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)

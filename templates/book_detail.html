@@ -9,13 +9,33 @@
     <p>by {{ book['author'] }}</p>
     <p>{{ book['description'] }}</p>
 
+    <form method="POST" action="/like/{{ book['id'] }}">
+        <button type="submit">{% if user_liked %}❤️ Liked{% else %}🤍 Like{% endif %}</button>
+    </form>
+    <p>{{ like_count }} likes</p>
+
     <h2>Chapters</h2>
     {% for chapter in chapters %}
         <p><a href="/read/{{ chapter['id'] }}">{{ chapter['title'] }}</a></p>
     {% endfor %}
-
     {% if chapters|length == 0 %}
         <p><em>No chapters available for this book yet.</em></p>
     {% endif %}
+
+    <h2>Reviews</h2>
+    <form method="POST" action="/review/{{ book['id'] }}">
+        <label>Rating (1-5):</label><br>
+        <input type="number" name="rating" min="1" max="5" required><br><br>
+        <label>Comment:</label><br>
+        <textarea name="comment" rows="3" required></textarea><br><br>
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <hr>
+    {% for review in reviews %}
+        <p><strong>{{ review['username'] }}</strong> rated it {{ review['rating'] }}/5</p>
+        <p>{{ review['comment'] }}</p>
+        <hr>
+    {% endfor %}
 </body>
 </html>
