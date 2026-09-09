@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Highlights - Read Rush</title>
+</head>
+<body>
+    <p><a href="/books">Back to Books</a></p>
+    <h1>My Highlights</h1>
+
+    {% for h in highlights %}
+        <p><strong>{{ h['book_title'] }}</strong> — <a href="/read/{{ h['chapter_id'] }}">{{ h['chapter_title'] }}</a></p>
+        <blockquote>"{{ h['highlighted_text'] }}"</blockquote>
+        <hr>
+    {% endfor %}
+
+    {% if highlights|length == 0 %}
+        <p><em>No highlights yet. Select text while reading to save one!</em></p>
+    {% endif %}
+</body>
+</html>

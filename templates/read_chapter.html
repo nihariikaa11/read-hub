@@ -4,7 +4,7 @@
     <title>{{ chapter['title'] }} - {{ book['title'] }}</title>
 </head>
 <body>
-    <p><a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a> | <a href="/bookmarks">My Bookmarks</a></p>
+    <p><a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a> | <a href="/bookmarks">My Bookmarks</a> | <a href="/highlights">My Highlights</a></p>
     <h1>{{ book['title'] }}</h1>
     <h2>{{ chapter['title'] }}</h2>
 
@@ -12,12 +12,49 @@
         <button type="submit">{% if is_bookmarked %}🔖 Bookmarked{% else %}📑 Bookmark this chapter{% endif %}</button>
     </form>
 
-    <p>{{ chapter['content'] }}</p>
+    <p><em>Select any text below and click "Highlight Selection" to save it.</em></p>
+    <button onclick="saveHighlight()">🖍️ Highlight Selection</button>
+
+    <p id="chapter-content">{{ chapter['content'] }}</p>
+
+    {% if my_highlights|length > 0 %}
+        <h3>Your Highlights in This Chapter</h3>
+        <ul>
+        {% for h in my_highlights %}
+            <li>{{ h['highlighted_text'] }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 
     <hr>
     <h3>All Chapters</h3>
     {% for ch in all_chapters %}
         <p><a href="/read/{{ ch['id'] }}">{{ ch['title'] }}</a></p>
     {% endfor %}
+
+    <script>
+        function saveHighlight() {
+            const selection = window.getSelection().toString();
+            if (!selection) {
+                alert("Please select some text first.");
+                return;
+            }
+
+            fetch("/highlight/{{ chapter['id'] }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: selection })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Highlight saved!");
+                    location.reload();
+                } else {
+                    alert("You need to be logged in to highlight.");
+                }
+            });
+        }
+    </script>
 </body>
 </html>

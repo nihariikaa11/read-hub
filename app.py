@@ -184,6 +184,7 @@ def read_chapter(chapter_id):
     all_chapters = conn.execute('SELECT * FROM chapters WHERE book_id = ? ORDER BY chapter_number', (chapter['book_id'],)).fetchall()
 
     is_bookmarked = False
+    my_highlights = []
     if 'user_id' in session:
         bookmark = conn.execute(
             'SELECT * FROM bookmarks WHERE user_id = ? AND chapter_id = ?',
@@ -191,8 +192,13 @@ def read_chapter(chapter_id):
         ).fetchone()
         is_bookmarked = bookmark is not None
 
+        my_highlights = conn.execute(
+            'SELECT * FROM highlights WHERE user_id = ? AND chapter_id = ?',
+            (session['user_id'], chapter_id)
+        ).fetchall()
+
     conn.close()
-    return render_template('read_chapter.html', chapter=chapter, book=book, all_chapters=all_chapters, is_bookmarked=is_bookmarked)
+    return render_template('read_chapter.html', chapter=chapter, book=book, all_chapters=all_chapters, is_bookmarked=is_bookmarked, my_highlights=my_highlights)
 
 @app.route('/like/<int:book_id>', methods=['POST'])
 def like_book(book_id):
@@ -270,6 +276,39 @@ def view_bookmarks():
     conn.close()
     return render_template('bookmarks.html', bookmarks=bookmarks)
 
+@app.route('/highlight/<int:chapter_id>', methods=['POST'])
+def add_highlight(chapter_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'not logged in'}), 401
+
+    data = request.get_json()
+    highlighted_text = data.get('text')
+
+    conn = get_db_connection()
+    conn.execute(
+        'INSERT INTO highlights (user_id, chapter_id, highlighted_text) VALUES (?, ?, ?)',
+        (session['user_id'], chapter_id, highlighted_text)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+@app.route('/highlights')
+def view_highlights():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    highlights = conn.execute('''
+        SELECT highlights.*, chapters.title as chapter_title, books.title as book_title, books.id as book_id
+        FROM highlights
+        JOIN chapters ON highlights.chapter_id = chapters.id
+        JOIN books ON chapters.book_id = books.id
+        WHERE highlights.user_id = ?
+        ORDER BY highlights.id DESC
+    ''', (session['user_id'],)).fetchall()
+    conn.close()
+    return render_template('highlights.html', highlights=highlights)
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
