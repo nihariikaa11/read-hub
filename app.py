@@ -175,15 +175,24 @@ def book_detail(book_id):
 
     conn.close()
     return render_template('book_detail.html', book=book, chapters=chapters, like_count=like_count, reviews=reviews, user_liked=user_liked)
-    
+
 @app.route('/read/<int:chapter_id>')
 def read_chapter(chapter_id):
     conn = get_db_connection()
     chapter = conn.execute('SELECT * FROM chapters WHERE id = ?', (chapter_id,)).fetchone()
     book = conn.execute('SELECT * FROM books WHERE id = ?', (chapter['book_id'],)).fetchone()
     all_chapters = conn.execute('SELECT * FROM chapters WHERE book_id = ? ORDER BY chapter_number', (chapter['book_id'],)).fetchall()
+
+    is_bookmarked = False
+    if 'user_id' in session:
+        bookmark = conn.execute(
+            'SELECT * FROM bookmarks WHERE user_id = ? AND chapter_id = ?',
+            (session['user_id'], chapter_id)
+        ).fetchone()
+        is_bookmarked = bookmark is not None
+
     conn.close()
-    return render_template('read_chapter.html', chapter=chapter, book=book, all_chapters=all_chapters)
+    return render_template('read_chapter.html', chapter=chapter, book=book, all_chapters=all_chapters, is_bookmarked=is_bookmarked)
 
 @app.route('/like/<int:book_id>', methods=['POST'])
 def like_book(book_id):
@@ -220,7 +229,47 @@ def add_review(book_id):
     )
     conn.commit()
     conn.close()
-    # return redirect(url_for('book_detail', book_id=book_id))
+    return redirect(url_for('book_detail', book_id=book_id))
+
+@app.route('/bookmark/<int:chapter_id>', methods=['POST'])
+def add_bookmark(chapter_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    chapter = conn.execute('SELECT * FROM chapters WHERE id = ?', (chapter_id,)).fetchone()
+
+    existing = conn.execute(
+        'SELECT * FROM bookmarks WHERE user_id = ? AND chapter_id = ?',
+        (session['user_id'], chapter_id)
+    ).fetchone()
+
+    if not existing:
+        conn.execute(
+            'INSERT INTO bookmarks (user_id, book_id, chapter_id, position) VALUES (?, ?, ?, ?)',
+            (session['user_id'], chapter['book_id'], chapter_id, 'start')
+        )
+        conn.commit()
+
+    conn.close()
+    return redirect(url_for('read_chapter', chapter_id=chapter_id))
+
+@app.route('/bookmarks')
+def view_bookmarks():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    bookmarks = conn.execute('''
+        SELECT bookmarks.*, chapters.title as chapter_title, books.title as book_title
+        FROM bookmarks
+        JOIN chapters ON bookmarks.chapter_id = chapters.id
+        JOIN books ON bookmarks.book_id = books.id
+        WHERE bookmarks.user_id = ?
+    ''', (session['user_id'],)).fetchall()
+    conn.close()
+    return render_template('bookmarks.html', bookmarks=bookmarks)
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)

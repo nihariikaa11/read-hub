@@ -4,9 +4,13 @@
     <title>{{ chapter['title'] }} - {{ book['title'] }}</title>
 </head>
 <body>
-    <p><a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a></p>
+    <p><a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a> | <a href="/bookmarks">My Bookmarks</a></p>
     <h1>{{ book['title'] }}</h1>
     <h2>{{ chapter['title'] }}</h2>
+
+    <form method="POST" action="/bookmark/{{ chapter['id'] }}">
+        <button type="submit">{% if is_bookmarked %}🔖 Bookmarked{% else %}📑 Bookmark this chapter{% endif %}</button>
+    </form>
 
     <p>{{ chapter['content'] }}</p>
 
