@@ -2,37 +2,159 @@
 <html>
 <head>
     <title>{{ chapter['title'] }} - {{ book['title'] }}</title>
+    <style>
+        body {
+            background: #3e2c23;
+            font-family: Georgia, serif;
+            text-align: center;
+            margin: 0;
+            padding: 30px 0;
+        }
+        .top-links {
+            color: #eee;
+            margin-bottom: 20px;
+        }
+        .top-links a {
+            color: #f0c987;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        #book-page {
+            background: #fdf6e3;
+            width: 600px;
+            max-width: 90%;
+            min-height: 500px;
+            margin: 0 auto;
+            padding: 50px 60px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            text-align: left;
+            transition: opacity 0.3s ease;
+        }
+        #book-page.flipping {
+            opacity: 0;
+        }
+        #page-text {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #3e2c23;
+            white-space: pre-wrap;
+        }
+        .page-controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-controls button {
+            background: #3e2c23;
+            color: #fdf6e3;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Georgia, serif;
+        }
+        .page-controls button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+        #page-number {
+            font-size: 14px;
+            color: #7a5c3e;
+        }
+        #highlight-btn {
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-    <p><a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a> | <a href="/bookmarks">My Bookmarks</a> | <a href="/highlights">My Highlights</a></p>
-    <h1>{{ book['title'] }}</h1>
-    <h2>{{ chapter['title'] }}</h2>
+    <div class="top-links">
+        <a href="/book/{{ book['id'] }}">Back to {{ book['title'] }}</a> |
+        <a href="/bookmarks">My Bookmarks</a> |
+        <a href="/highlights">My Highlights</a>
+    </div>
 
-    <form method="POST" action="/bookmark/{{ chapter['id'] }}">
-        <button type="submit">{% if is_bookmarked %}🔖 Bookmarked{% else %}📑 Bookmark this chapter{% endif %}</button>
-    </form>
+    <h2 style="color:#f0c987;">{{ book['title'] }} — {{ chapter['title'] }}</h2>
 
-    <p><em>Select any text below and click "Highlight Selection" to save it.</em></p>
-    <button onclick="saveHighlight()">🖍️ Highlight Selection</button>
+    <div id="book-page">
+        <div id="page-text"></div>
+    </div>
 
-    <p id="chapter-content">{{ chapter['content'] }}</p>
+    <div class="page-controls" style="width:600px; max-width:90%; margin:20px auto 0;">
+        <button id="prev-btn" onclick="changePage(-1)">← Prev</button>
+        <span id="page-number"></span>
+        <button id="next-btn" onclick="changePage(1)">Next →</button>
+    </div>
+
+    <div style="margin-top:20px;">
+        <form method="POST" action="/bookmark/{{ chapter['id'] }}" style="display:inline;">
+            <button type="submit">{% if is_bookmarked %}🔖 Bookmarked{% else %}📑 Bookmark this chapter{% endif %}</button>
+        </form>
+        <button id="highlight-btn" onclick="saveHighlight()">🖍️ Highlight Selection</button>
+    </div>
 
     {% if my_highlights|length > 0 %}
-        <h3>Your Highlights in This Chapter</h3>
-        <ul>
-        {% for h in my_highlights %}
-            <li>{{ h['highlighted_text'] }}</li>
-        {% endfor %}
-        </ul>
+        <div style="width:600px; max-width:90%; margin:20px auto; color:#eee; text-align:left;">
+            <h3>Your Highlights in This Chapter</h3>
+            <ul>
+            {% for h in my_highlights %}
+                <li>{{ h['highlighted_text'] }}</li>
+            {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
-    <hr>
-    <h3>All Chapters</h3>
-    {% for ch in all_chapters %}
-        <p><a href="/read/{{ ch['id'] }}">{{ ch['title'] }}</a></p>
-    {% endfor %}
+    <div style="margin-top:20px;">
+        <h3 style="color:#f0c987;">All Chapters</h3>
+        {% for ch in all_chapters %}
+            <p><a href="/read/{{ ch['id'] }}" style="color:#f0c987;">{{ ch['title'] }}</a></p>
+        {% endfor %}
+    </div>
 
     <script>
+        const fullText = {{ chapter['content']|tojson }};
+        const CHARS_PER_PAGE = 1200;
+
+        function paginate(text, size) {
+            const pages = [];
+            let i = 0;
+            while (i < text.length) {
+                let end = i + size;
+                if (end < text.length) {
+                    const lastSpace = text.lastIndexOf(' ', end);
+                    if (lastSpace > i) end = lastSpace;
+                }
+                pages.push(text.slice(i, end).trim());
+                i = end;
+            }
+            return pages.length ? pages : [text];
+        }
+
+        const pages = paginate(fullText, CHARS_PER_PAGE);
+        let currentPage = 0;
+
+        function renderPage() {
+            const pageDiv = document.getElementById('book-page');
+            pageDiv.classList.add('flipping');
+            setTimeout(() => {
+                document.getElementById('page-text').innerText = pages[currentPage];
+                document.getElementById('page-number').innerText = `Page ${currentPage + 1} of ${pages.length}`;
+                document.getElementById('prev-btn').disabled = currentPage === 0;
+                document.getElementById('next-btn').disabled = currentPage === pages.length - 1;
+                pageDiv.classList.remove('flipping');
+            }, 150);
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 0 && newPage < pages.length) {
+                currentPage = newPage;
+                renderPage();
+            }
+        }
+
         function saveHighlight() {
             const selection = window.getSelection().toString();
             if (!selection) {
@@ -55,6 +177,8 @@
                 }
             });
         }
+
+        renderPage();
     </script>
 </body>
 </html>
