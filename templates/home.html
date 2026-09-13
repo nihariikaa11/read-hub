@@ -2,15 +2,39 @@
 <html>
 <head>
     <title>Read Rush - Home</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Welcome to Read Rush 📚</h1>
+    <div class="navbar">
+        <a href="/" class="logo">
+    <span class="book-icon">📖</span>
+    <span class="read-text">Read</span><span class="rush-text">Rush</span>
+</a>
+        <div class="nav-links">
+            {% if session.get('username') %}
+                <a href="/books">Browse Books</a>
+                <a href="/bookmarks">Bookmarks</a>
+                <a href="/highlights">Highlights</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/signup">Sign Up</a>
+                <a href="/login">Login</a>
+            {% endif %}
+        </div>
+    </div>
 
-    {% if session.get('username') %}
-        <p>Welcome back, {{ session['username'] }}!</p>
-        <p><a href="/books">Browse Books</a> | <a href="/logout">Logout</a></p>
-    {% else %}
-        <p><a href="/signup">Sign Up</a> | <a href="/login">Login</a></p>
-    {% endif %}
+           <div class="container center-text">
+                <p class="eyebrow">✦ A BOOKSHOP FOR THE CURIOUS ✦</p>
+        <h1 class="hero-title">
+            Welcome to <span class="hero-read">Read</span><span class="hero-rush">Rush</span>
+        </h1>
+        {% if session.get('username') %}
+            <p class="tagline">Welcome back, {{ session['username'] }} — pick up where you left off.</p>
+            <a href="/books" class="btn">Start Reading</a>
+        {% else %}
+            <p class="tagline">Stories that pull you in, pages that fly by.</p>
+            <a href="/signup" class="btn">Get Started</a>
+        {% endif %}
+    </div>
 </body>
 </html>

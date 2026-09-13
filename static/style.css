@@ -1,0 +1,155 @@
+/* Read Rush - Global Styles */
+
+body {
+    background: #2b1d14;
+    color: #f0e6d2;
+    font-family: Georgia, 'Times New Roman', serif;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background: #1f140d;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.navbar .logo {
+    font-size: 26px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.navbar .logo .book-icon {
+    font-size: 22px;
+}
+
+.navbar .logo .read-text {
+    color: #f0e6d2;
+    font-weight: bold;
+    font-family: Georgia, serif;
+}
+
+.navbar .logo .rush-text {
+    color: #f0c987;
+    font-style: italic;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 30px;
+    margin-left: -2px;
+}
+.hero-title {
+    font-size: 36px;
+    color: #f0e6d2;
+    margin-bottom: 20px;
+}
+
+.hero-read {
+    color: #f0e6d2;
+    font-weight: bold;
+    font-family: Georgia, serif;
+}
+
+.hero-rush {
+    color: #f0c987;
+    font-style: italic;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 44px;
+    margin-left: -3px;
+}
+
+.container {
+    max-width: 500px;
+    margin: 60px auto;
+    background: #3e2c23;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+h1, h2 {
+    color: #f0c987;
+}
+
+label {
+    color: #ddd;
+    font-size: 14px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 16px;
+    border: none;
+    border-radius: 4px;
+    background: #fdf6e3;
+    color: #2b1d14;
+    font-family: Georgia, serif;
+    box-sizing: border-box;
+}
+
+button, .btn {
+    background: #f0c987;
+    color: #2b1d14;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+button:hover, .btn:hover {
+    background: #f7d9a3;
+}
+
+a {
+    color: #f0c987;
+}
+
+.center-text {
+    text-align: center;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #55402f;
+    margin: 20px 0;
+}
+.eyebrow {
+    color: #a67c52;
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+}
+
+.tagline {
+    color: #d8c9b0;
+    font-style: italic;
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+.divider {
+    font-size: 20px;
+    color: #f0c987;
+    margin: 14px 0;
+    opacity: 0.8;
+}
+
+.btn {
+    display: inline-block;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    background: #f7d9a3;
+}
