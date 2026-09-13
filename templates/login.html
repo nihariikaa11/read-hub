@@ -2,22 +2,31 @@
 <html>
 <head>
     <title>Login - Read Rush</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<a href="/" class="logo">
-    <span class="book-icon">📖</span>
-    <span class="read-text">Read</span><span class="rush-text">Rush</span>
-</a>
-    <h2>Login to Your Account</h2>
-    <form method="POST" action="/login">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+    <div class="navbar">
+        <a href="/" class="logo">
+            <span class="book-icon">📖</span>
+            <span class="read-text">Read</span><span class="rush-text">Rush</span>
+        </a>
+        <div class="nav-links">
+            <a href="/signup">Sign Up</a>
+        </div>
+    </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+    <div class="container">
+        <h2>Login to Your Account</h2>
+        <form method="POST" action="/login">
+            <label>Username:</label>
+            <input type="text" name="username" required>
 
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="/signup">Sign up here</a></p>
+            <label>Password:</label>
+            <input type="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <p class="center-text">Don't have an account? <a href="/login">Login here</a></p>
+    </div>
 </body>
 </html>
