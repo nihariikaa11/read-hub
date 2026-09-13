@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Bookmarks - Read Rush</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/" class="logo">
+            <span class="book-icon">📖</span>
+            <span class="read-text">Read</span><span class="rush-text">Rush</span>
+        </a>
+        <div class="nav-links">
+            <a href="/books">Browse Books</a>
+            <a href="/highlights">Highlights</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🔖 My Bookmarks</h1>
+        {% for bm in bookmarks %}
+            <p><a href="/read/{{ bm['chapter_id'] }}">{{ bm['book_title'] }} — {{ bm['chapter_title'] }}</a></p>
+            <hr>
+        {% endfor %}
+        {% if bookmarks|length == 0 %}
+            <p><em>No bookmarks yet. Start reading and bookmark a chapter!</em></p>
+        {% endif %}
+    </div>
+</body>
+</html>

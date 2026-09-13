@@ -2,19 +2,30 @@
 <html>
 <head>
     <title>My Highlights - Read Rush</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <p><a href="/books">Back to Books</a></p>
-    <h1>My Highlights</h1>
+    <div class="navbar">
+        <a href="/" class="logo">
+            <span class="book-icon">📖</span>
+            <span class="read-text">Read</span><span class="rush-text">Rush</span>
+        </a>
+        <div class="nav-links">
+            <a href="/books">Browse Books</a>
+            <a href="/bookmarks">Bookmarks</a>
+        </div>
+    </div>
 
-    {% for h in highlights %}
-        <p><strong>{{ h['book_title'] }}</strong> — <a href="/read/{{ h['chapter_id'] }}">{{ h['chapter_title'] }}</a></p>
-        <blockquote>"{{ h['highlighted_text'] }}"</blockquote>
-        <hr>
-    {% endfor %}
-
-    {% if highlights|length == 0 %}
-        <p><em>No highlights yet. Select text while reading to save one!</em></p>
-    {% endif %}
+    <div class="container">
+        <h1>🖍️ My Highlights</h1>
+        {% for h in highlights %}
+            <p><strong>{{ h['book_title'] }}</strong> — <a href="/read/{{ h['chapter_id'] }}">{{ h['chapter_title'] }}</a></p>
+            <blockquote style="color:#d8c9b0; font-style:italic; border-left:3px solid #f0c987; padding-left:14px;">"{{ h['highlighted_text'] }}"</blockquote>
+            <hr>
+        {% endfor %}
+        {% if highlights|length == 0 %}
+            <p><em>No highlights yet. Select text while reading to save one!</em></p>
+        {% endif %}
+    </div>
 </body>
 </html>
